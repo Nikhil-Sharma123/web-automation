@@ -1,0 +1,27 @@
+{
+  "name": "playwright",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test:api": "playwright test --project=api-tests --reporter=./api-tests/api-passfail-reporter.js,./api-tests/html-report-generator.js",
+    "test:carshare": "playwright test tests/ClickCarshare.spec.js --project=\"Google Chrome\" --reporter=./tests/ui-passfail-reporter.js,./tests/ui-html-report-generator.js",
+    "test:carshare:headed": "playwright test tests/ClickCarshare.spec.js --project=\"Google Chrome\" --reporter=./tests/ui-passfail-reporter.js,./tests/ui-html-report-generator.js --headed",
+    "test:rental": "playwright test tests/ClickRental.spec.js --project=\"Google Chrome\" --reporter=./tests/ui-passfail-reporter.js,./tests/ui-html-report-generator.js",
+    "test:rental:headed": "playwright test tests/ClickRental.spec.js --project=\"Google Chrome\" --reporter=./tests/ui-passfail-reporter.js,./tests/ui-html-report-generator.js --headed",
+    "test:intell": "playwright test tests/IntellTenant.spec.js --project=\"Google Chrome\" --reporter=./tests/ui-passfail-reporter.js,./tests/ui-html-report-generator.js",
+    "test:intell:headed": "playwright test tests/IntellTenant.spec.js --project=\"Google Chrome\" --reporter=./tests/ui-passfail-reporter.js,./tests/ui-html-report-generator.js --headed",
+    "test:freedemo": "playwright test tests/FreeDemo_DeleteBuilding.spec.js --project=\"Google Chrome\" --reporter=./tests/ui-passfail-reporter.js,./tests/ui-html-report-generator.js",
+    "test:freedemo:headed": "playwright test tests/FreeDemo_DeleteBuilding.spec.js --project=\"Google Chrome\" --reporter=./tests/ui-passfail-reporter.js,./tests/ui-html-report-generator.js --headed"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.56.0",
+    "@types/node": "^24.7.0"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5"
+  }
+}
