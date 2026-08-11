@@ -12,7 +12,9 @@
     "test:intell": "playwright test tests/IntellTenant.spec.js --project=\"Google Chrome\" --reporter=./tests/ui-passfail-reporter.js,./tests/ui-html-report-generator.js",
     "test:intell:headed": "playwright test tests/IntellTenant.spec.js --project=\"Google Chrome\" --reporter=./tests/ui-passfail-reporter.js,./tests/ui-html-report-generator.js --headed",
     "test:freedemo": "playwright test tests/FreeDemo_DeleteBuilding.spec.js --project=\"Google Chrome\" --reporter=./tests/ui-passfail-reporter.js,./tests/ui-html-report-generator.js",
-    "test:freedemo:headed": "playwright test tests/FreeDemo_DeleteBuilding.spec.js --project=\"Google Chrome\" --reporter=./tests/ui-passfail-reporter.js,./tests/ui-html-report-generator.js --headed"
+    "test:freedemo:headed": "playwright test tests/FreeDemo_DeleteBuilding.spec.js --project=\"Google Chrome\" --reporter=./tests/ui-passfail-reporter.js,./tests/ui-html-report-generator.js --headed",
+    "test:regression": "playwright test tests/regression.spec.js --project=\"Google Chrome\" --reporter=./tests/ui-passfail-reporter.js,./tests/ui-html-report-generator.js",
+    "test:regression:headed": "playwright test tests/regression.spec.js --project=\"Google Chrome\" --reporter=./tests/ui-passfail-reporter.js,./tests/ui-html-report-generator.js --headed"
   },
   "keywords": [],
   "author": "",
@@ -22,6 +24,8 @@
     "@types/node": "^24.7.0"
   },
   "dependencies": {
-    "dotenv": "^16.4.5"
+    "dictionary-en": "^4.0.0",
+    "dotenv": "^16.4.5",
+    "nspell": "^2.1.5"
   }
 }

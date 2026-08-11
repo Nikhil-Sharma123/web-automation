@@ -13,3 +13,6 @@ auth.json
 .env
 *.log
 .claude/settings.local.json
+
+# Generated QA report artifacts (regenerated on every run)
+*-report.html

@@ -1783,24 +1783,35 @@ test.describe('IntellTenant', () => {
       // "Not Available" — this widget's legend distinguishes Available (green) /
       // Not Available (gray) / Booked (red) / Currently Selected (yellow), but
       // slots that far out are simply not bookable yet. Page forward week-by-week
-      // (via the ">" nav arrow) until an actual available slot shows up, instead
-      // of giving up after a single "Next" click.
-      const availableSlotSelector =
+      // (via the ">" nav arrow) until a click actually registers as a selection.
+      //
+      // The class-name guess below can't reliably tell available from not-available
+      // slots (their class names don't consistently hyphenate "not-available"), so a
+      // "Not Available" slot can match it too. Clicking one doesn't register — the
+      // "Elevator Booking Slot" status stays "Not Selected" — so selection is confirmed
+      // by reading that status back after each click instead of trusting the class name.
+      const candidateSlotSelector =
         'a.available, button.available, .time-slot:not(.disabled), .slot:not(.disabled), ' +
         '[class*="available" i]:not([class*="not-available" i]):not([class*="unavailable" i])';
       const nextWeekBtn = elevatorPage.locator('button, a, [role="button"]')
         .filter({ hasText: /^(Next|>|›|Forward)$/i })
         .or(elevatorPage.locator('[aria-label*="next" i], [class*="next" i]'))
         .first();
+      const notSelectedStatus = elevatorPage.locator('text=Not Selected').first();
 
       let slotFound = false;
       for (let week = 0; week < 8 && !slotFound; week++) {
-        const firstAvailableTime = elevatorPage.locator(availableSlotSelector).first();
-        slotFound = await firstAvailableTime.isVisible({ timeout: 3000 }).catch(() => false);
-        if (slotFound) {
-          await firstAvailableTime.click();
-          break;
+        const candidates = elevatorPage.locator(candidateSlotSelector);
+        const candidateCount = await candidates.count();
+        for (let i = 0; i < candidateCount && !slotFound; i++) {
+          const candidate = candidates.nth(i);
+          if (!(await candidate.isVisible().catch(() => false))) continue;
+          await candidate.click().catch(() => {});
+          await elevatorPage.waitForTimeout(400);
+          // Still showing "Not Selected" → this candidate didn't really take; try the next one.
+          slotFound = !(await notSelectedStatus.isVisible({ timeout: 1000 }).catch(() => true));
         }
+        if (slotFound) break;
         if (await nextWeekBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
           await nextWeekBtn.click();
           await elevatorPage.waitForTimeout(1000);
@@ -1810,14 +1821,20 @@ test.describe('IntellTenant', () => {
       }
 
       if (!slotFound) {
-        console.log(`    ${C.yellow}No available elevator slot found across 8 weeks of paging forward — every visible week showed all slots as "Not Available".${C.reset}`);
+        console.log(`    ${C.yellow}No available elevator slot found across 8 weeks of paging forward — every candidate slot failed to register as selected.${C.reset}`);
       } else {
         await elevatorPage.waitForTimeout(500);
-        const bookBtn = elevatorPage.locator('button').filter({ hasText: /BOOK/i }).first();
-        if (await bookBtn.isVisible({ timeout: 5000 }).catch(() => false)) await bookBtn.click();
+        const bookBtn   = elevatorPage.locator('button').filter({ hasText: /BOOK/i }).first();
+        const bookReady = (await bookBtn.isVisible({ timeout: 5000 }).catch(() => false))
+          && (await bookBtn.isEnabled().catch(() => false));
 
-        const okBtn = elevatorPage.locator('button').filter({ hasText: /Ok|Confirm|Close/i }).first();
-        if (await okBtn.isVisible({ timeout: 5000 }).catch(() => false)) await okBtn.click();
+        if (bookReady) {
+          await bookBtn.click();
+          const okBtn = elevatorPage.locator('button').filter({ hasText: /Ok|Confirm|Close/i }).first();
+          if (await okBtn.isVisible({ timeout: 5000 }).catch(() => false)) await okBtn.click();
+        } else {
+          console.log(`    ${C.yellow}BOOK button stayed disabled after selecting a slot — skipping booking.${C.reset}`);
+        }
       }
       // Explicit 20s wait for the new page + up to 5 sequential slot-picking fallback
       // checks (3-5s each) can approach the 45s default — bumped for headroom.
